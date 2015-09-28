@@ -52,6 +52,47 @@ Data API
 
 ### 爬蟲規格 (Crawler Spec)
 
+> 此處描述之爬蟲規格為終端爬蟲類別 (class) 介面規格，藉由統一介面達到可抽換、易測試。爬蟲應用程式回報資料的 API 規格請參見 https://github.com/colorgy/Core/wiki。
+
+Each crawler instance represents a set of data.
+
+#### Ruby
+
+```rb
+require './crawler.rb'  # The crawler may lives in a different file
+crawler = Crawler.new(year: 2012, term: 2)  # The crawler class may have a different name
+crawler.courses  # returns the data
+```
+
+#### Node.js
+
+(ES6)
+
+```js
+import Crawler from 'crawler';  // The crawler may lives in a different file and have a different class name
+
+// Initialize new crawler
+var crawler = new Crawler();
+crawler.year = 2015;
+crawler.term = 1;
+// or
+crawler = new Crawler({ year: 2015, term: 1 });
+
+// Start crawling, callbacks are provided by promise pattern
+crawler.crawl()
+  .then(function (data) { console.log(data); })
+  .catch(function (err) { console.error(err); });
+  
+// Start crawling and log the progress down
+crawler.crawl({ onProgressUpdate: function (progress) { console.log('Progress: ' + progress); } });
+
+// Run a function after new data received
+crawler.crawl({ onDataReceived: function (data) { console.log('Data: ' + data); } });
+
+// Get the crawled data
+crawler.getData();
+```
+
 ## 上課節次時間資料 (Period Data)
 
 Data API
