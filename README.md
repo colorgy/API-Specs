@@ -93,6 +93,8 @@ crawler.crawl({ onDataReceived: function (data) { console.log('Data: ' + data); 
 crawler.getData();
 ```
 
+- - -
+
 ## 上課節次時間資料 (Period Data)
 
 Data API
@@ -112,6 +114,8 @@ Data API
 ### 爬蟲規格 (Crawler Spec)
 
 暫無，目前資料均為手動收集輸入。
+
+- - -
 
 ## 書籍資料 (Book Data)
 
