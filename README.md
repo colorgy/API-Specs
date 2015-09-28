@@ -87,7 +87,7 @@ crawler.crawl()
 crawler.crawl({ onProgressUpdate: function (progress) { console.log('Progress: ' + progress); } });
 
 // Run a function after new data received
-crawler.crawl({ onDataReceived: function (data) { console.log('Data: ' + data); } });
+crawler.crawl({ onDataReceived: function (data) { console.dir(data); } });
 
 // Get the crawled data
 crawler.getData();
