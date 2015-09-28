@@ -66,10 +66,8 @@ crawler.courses  # returns the data
 
 #### Node.js
 
-(ES6)
-
 ```js
-import Crawler from 'crawler';  // The crawler may lives in a different file and have a different class name
+var Crawler = require('crawler');  // The crawler may lives in a different file and have a different class name
 
 // Initialize new crawler
 var crawler = new Crawler();
