@@ -6,6 +6,7 @@ API 與資料接口規格
 
 **Table of Contents**
 
+- [通用爬蟲規格 (General Crawler Spec)](#通用爬蟲規格-general-crawler-spec)
 - [課程資料 (Course)](#課程資料-course)
   - [API 端點](#api-端點-api-endpoint)
   - [資料格式 (Attributes)](#資料格式-attributes)
@@ -18,6 +19,66 @@ API 與資料接口規格
   - [API 端點](#api-端點-api-endpoint-2)
   - [資料格式 (Attributes)](#資料格式-attributes-2)
   - [爬蟲規格 (Crawler Spec)](#爬蟲規格-crawler-spec-2)
+
+- - -
+
+## 通用爬蟲規格 (General Crawler Spec)
+
+> 此處描述之爬蟲規格為終端爬蟲類別 (class) 介面規格，藉由統一介面達到可抽換、易測試。爬蟲應用程式回報資料的 API 規格請參見 https://github.com/colorgy/Core/wiki。
+
+#### 設計哲學：
+
+- An crawler class is corresponded to one data collection, e.g.: all courses from a school, all scholarships provided for students in an university.
+- Each crawler instance represents a subset of data, the scope can be set while the crawler instance is initialized. Some scopes may be required (e.g.: the `year` and `term` for a course crawler, because there's too many courses in a school over years and we definitely cannot crawl them once).
+- Two callback functions can be set while starts crawling: one for reporting the current progress, and the other called after receiving each data. The first "progress reporting" callback function should be called and passed in an `float` to represent the current crawling progress (`0.0` ~ `1.0`) while progressing. On the other hand, the second data received callback function must be called if provided, right after the crawler done processing a data - this callback can be used to upload new data to the database, or do any post-process to the data.
+
+#### Ruby
+
+```rb
+require './crawler.rb'  # The crawler may lives in a different file
+
+# Initalize the crawler
+crawler = Crawler.new(year: 2012, term: 2)  # The crawler class may have a different name and have different scope sets
+
+# Start crawling
+crawler.crawl
+
+# Start crawling and print the progress out
+crawler.crawl(update_progress: proc { |p| puts "Progress: #{p}" })
+
+# Start crawling and print each data out
+crawler.crawl(after_each: proc { |d| puts "Got data: #{d}" })
+
+# Get the crawled data
+crawler.data  # returns the data in an array
+```
+
+#### Node.js
+
+```js
+var Crawler = require('crawler');  // The crawler may lives in a different file and have a different class name
+
+// Initialize new crawler, the crawler may have different scope sets
+var crawler = new Crawler();
+crawler.year = 2015;
+crawler.term = 1;
+// or
+crawler = new Crawler({ year: 2015, term: 1 });
+
+// Start crawling, callbacks are provided by the promise pattern
+crawler.crawl()
+  .then(function (data) { console.log(data); })
+  .catch(function (err) { console.error(err); });
+  
+// Start crawling and log the progress down
+crawler.crawl({ onProgressUpdate: function (progress) { console.log('Progress: ' + progress); } });
+
+// Run a function after new data received
+crawler.crawl({ onDataReceived: function (data) { console.dir(data); } });
+
+// Get the crawled data
+crawler.getData();
+```
 
 - - -
 
@@ -67,44 +128,7 @@ Data API
 
 ### 爬蟲規格 (Crawler Spec)
 
-> 此處描述之爬蟲規格為終端爬蟲類別 (class) 介面規格，藉由統一介面達到可抽換、易測試。爬蟲應用程式回報資料的 API 規格請參見 https://github.com/colorgy/Core/wiki。
-
-Each crawler instance represents a set of data.
-
-#### Ruby
-
-```rb
-require './crawler.rb'  # The crawler may lives in a different file
-crawler = Crawler.new(year: 2012, term: 2)  # The crawler class may have a different name
-crawler.courses  # returns the data
-```
-
-#### Node.js
-
-```js
-var Crawler = require('crawler');  // The crawler may lives in a different file and have a different class name
-
-// Initialize new crawler
-var crawler = new Crawler();
-crawler.year = 2015;
-crawler.term = 1;
-// or
-crawler = new Crawler({ year: 2015, term: 1 });
-
-// Start crawling, callbacks are provided by promise pattern
-crawler.crawl()
-  .then(function (data) { console.log(data); })
-  .catch(function (err) { console.error(err); });
-  
-// Start crawling and log the progress down
-crawler.crawl({ onProgressUpdate: function (progress) { console.log('Progress: ' + progress); } });
-
-// Run a function after new data received
-crawler.crawl({ onDataReceived: function (data) { console.dir(data); } });
-
-// Get the crawled data
-crawler.getData();
-```
+同[通用爬蟲規格](#通用爬蟲規格-general-crawler-spec)。
 
 - - -
 
